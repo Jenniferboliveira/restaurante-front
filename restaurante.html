@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>La Maison — Restaurante À La Carte</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="restaurante.css"/>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">La Maison</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('login')">Entrar</button>
+    <button class="nav-tab" onclick="showPage('cardapio')">Cardápio</button>
+    <button class="nav-tab" onclick="showPage('pedidos')">Meus Pedidos <span class="nav-badge" id="badge-pedidos">0</span></button>
+    <button class="nav-tab" id="tab-manager" style="display:none" onclick="showPage('manager')">Manager</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="nav-user" id="nav-user">—</div>
+    <button id="btn-logout" style="display:none" onclick="doLogout()" class="btn-logout">Sair</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="page-login" class="page active">
+  <div class="login-card">
+    <div class="login-title">La Maison</div>
+    <div class="login-sub">Restaurante À La Carte</div>
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setLoginTab('cliente')">Cliente</button>
+      <button class="login-tab" onclick="setLoginTab('manager')">Manager</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Usuário</label>
+      <input class="form-input" id="login-user" type="text" placeholder="seu usuário" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="form-input" id="login-pass" type="password" placeholder="••••••••" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div id="login-error" style="color:#f38ba8;font-size:0.75rem;text-align:center;margin-top:0.75rem;display:none"></div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <span style="color:var(--text-light);font-size:0.65rem;letter-spacing:0.1em">NÃO TEM CONTA? </span>
+      <button onclick="showPage('cadastro')" style="background:none;border:none;color:var(--gold);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase">Cadastre-se</button>
+    </div>
+  </div>
+</div>
+
+<!-- CADASTRO -->
+<div id="page-cadastro" class="page">
+  <div class="login-card">
+    <div class="login-title">Cadastro</div>
+    <div class="login-sub">Crie sua conta</div>
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setCadastroTab('cliente')">Cliente</button>
+      <button class="login-tab" onclick="setCadastroTab('manager')">Manager</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Usuário</label>
+      <input class="form-input" id="cad-user" type="text" placeholder="escolha um usuário" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="form-input" id="cad-pass" type="password" placeholder="mínimo 6 caracteres" />
+    </div>
+    <div id="cad-cpf-group" class="form-group" style="display:none">
+      <label class="form-label">CPF (só números)</label>
+      <input class="form-input" id="cad-cpf" type="text" placeholder="00000000000" maxlength="11"/>
+    </div>
+    <button class="btn-primary" onclick="doCadastro()">Criar Conta</button>
+    <div id="cad-error" style="color:#f38ba8;font-size:0.75rem;text-align:center;margin-top:0.75rem;display:none"></div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <button onclick="showPage('login')" style="background:none;border:none;color:var(--gold);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase">← Voltar ao Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARDÁPIO -->
+<div id="page-cardapio" class="page">
+  <div class="page-header">
+    <div class="page-header-title">Cardápio</div>
+    <div class="page-header-sub">Seleção do Chef</div>
+    <div class="divider-ornament">✦</div>
+  </div>
+  <div id="cardapio-loading" style="text-align:center;padding:3rem;color:var(--text-light)">Carregando cardápio...</div>
+  <div class="cardapio-grid" id="cardapio-grid"></div>
+</div>
+
+<!-- PEDIDOS -->
+<div id="page-pedidos" class="page">
+  <div class="page-header">
+    <div class="page-header-title">Meus Pedidos</div>
+    <div class="page-header-sub">Histórico e acompanhamento</div>
+    <div class="divider-ornament">✦</div>
+  </div>
+  <div class="pedidos-container" id="pedidos-list"></div>
+</div>
+
+<!-- MANAGER -->
+<div id="page-manager" class="page">
+  <div class="page-header">
+    <div class="page-header-title">Painel do Manager</div>
+    <div class="page-header-sub">Gestão de pratos e divulgação</div>
+    <div class="divider-ornament">✦</div>
+  </div>
+  <div class="manager-container">
+    <div class="manager-grid">
+
+      <!-- Novo Prato -->
+      <div class="manager-card">
+        <div class="manager-card-title">✦ Novo Prato</div>
+        <div class="form-group">
+          <label class="form-label">Nome do Prato</label>
+          <input class="form-input" id="m-nome" type="text" placeholder="Ex: Risoto de Cogumelos"/>
+        </div>
+        <div class="input-row">
+          <div style="flex:1">
+            <label class="form-label">Valor (R$)</label>
+            <input class="form-input" id="m-valor" type="number" placeholder="0,00" step="0.01" min="0"/>
+          </div>
+          <div style="flex:1">
+            <label class="form-label">Status</label>
+            <select class="form-input select-input" id="m-status">
+              <option value="PREPARANDO">Preparando</option>
+              <option value="PRONTO">Pronto</option>
+              <option value="FINALIZADO">Finalizado</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="adicionarPrato()">Adicionar ao Cardápio</button>
+      </div>
+
+      <!-- Lista de Pratos -->
+      <div class="manager-card">
+        <div class="manager-card-title">✦ Pratos Cadastrados</div>
+        <div id="manager-loading" style="color:var(--text-light);font-size:0.8rem;text-align:center;padding:1rem">Carregando...</div>
+        <div class="manager-prato-list" id="manager-prato-list"></div>
+      </div>
+
+      <!-- Pedidos em aberto -->
+      <div class="manager-card">
+        <div class="manager-card-title">✦ Pedidos em Aberto</div>
+        <div class="manager-prato-list" id="manager-pedidos-list"></div>
+      </div>
+
+      <!-- Divulgação -->
+      <div class="manager-card divulgacao-card">
+        <div class="manager-card-title">✦ Divulgação do Restaurante</div>
+        <div class="canais-grid">
+          <button class="canal-btn" id="canal-WHATSAPP" onclick="toggleCanal('WHATSAPP')">ðŸ“± WhatsApp</button>
+          <button class="canal-btn" id="canal-EMAIL" onclick="toggleCanal('EMAIL')">✉️ E-mail</button>
+          <button class="canal-btn" id="canal-INSTAGRAM" onclick="toggleCanal('INSTAGRAM')">ðŸ“¸ Instagram</button>
+          <button class="canal-btn" id="canal-FACEBOOK" onclick="toggleCanal('FACEBOOK')">ðŸ‘¥ Facebook</button>
+          <button class="canal-btn" id="canal-TWITTER" onclick="toggleCanal('TWITTER')">ðŸ¦ Twitter</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mensagem</label>
+          <textarea class="form-input" id="div-msg" rows="3" placeholder="Ex: Novidades no cardápio! ðŸ½️" style="resize:vertical;font-family:'Montserrat',sans-serif;font-size:0.85rem;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destinatário / Perfil</label>
+          <input class="form-input" id="div-dest" type="text" placeholder="+55 71 99999-9999 / @restaurante / email@ex.com"/>
+        </div>
+        <button class="btn-primary" onclick="enviarDivulgacao()">Enviar Divulgação</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="restaurante.js"></script>
+</body>
+</html>
